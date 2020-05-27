@@ -2,6 +2,8 @@ export default class Customizator {
   constructor() {
     this.btnBlock = document.createElement("div");
     this.colorPicker = document.createElement("input");
+    this.scale = localStorage.getItem("scale") || 1;
+    this.color = localStorage.getItem("color") || "#ffffff";
 
     this.btnBlock.addEventListener("click", (event) =>
       this.onScaleChange(event)
@@ -13,9 +15,8 @@ export default class Customizator {
   }
 
   onScaleChange(event) {
-    let scale;
     const body = document.querySelector("body");
-    if (event.target.value) {
+    if (event) {
       scale = +event.target.value.replace(/x/g, "");
     }
 
@@ -44,7 +45,13 @@ export default class Customizator {
   onColorChange(event) {
     const body = document.querySelector("body");
     body.style.backgroundColor = event.target.value;
-    console.log(event.target.value);
+    localStorage.setItem("color", event.target.value);
+  }
+
+  setBgColor() {
+    const body = document.querySelector("body");
+    body.style.backgroundColor = this.color;
+    this.colorPicker.value = this.color;
   }
 
   injectStyle() {
@@ -87,6 +94,7 @@ export default class Customizator {
   }
   render() {
     this.injectStyle();
+    this.setBgColor();
 
     let scaleInputSmall = document.createElement("input"),
       scaleInputMedium = document.createElement("input"),
