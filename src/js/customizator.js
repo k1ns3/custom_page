@@ -1,10 +1,38 @@
 export default class Customizator {
-  constructor() {}
-
-  render() {
+  constructor() {
     this.btnBlock = document.createElement("div");
     this.colorPicker = document.createElement("input");
 
+    this.btnBlock.addEventListener("click", (event) =>
+      this.onScaleChange(event)
+    );
+  }
+
+  onScaleChange(event) {
+    let scale;
+    const body = document.querySelector("body");
+    if (event.target.value) {
+      scale = +event.target.value.replace(/x/g, "");
+    }
+
+    function recursy(element) {
+      element.childNodes.forEach((node) => {
+        if (
+          node.nodeName === "#text" &&
+          node.nodeValue.replace(/\s+/g, "").length > 0
+        ) {
+          let value = window.getComputedStyle(node.parentNode, null).fontSize;
+          node.parentNode.style.fontSize =
+            value.replace(/px/g, "") * scale + "px";
+        } else {
+          recursy(node);
+        }
+      });
+    }
+    recursy(body);
+  }
+
+  render() {
     let scaleInputSmall = document.createElement("input"),
       scaleInputMedium = document.createElement("input"),
       panel = document.createElement("div");
@@ -28,7 +56,5 @@ export default class Customizator {
     panel.classList.add("panel");
 
     document.querySelector("body").append(panel);
-
-    console.log(this.btnBlock, scaleInputSmall, scaleInputMedium);
   }
 }
