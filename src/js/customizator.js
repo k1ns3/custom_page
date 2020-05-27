@@ -6,6 +6,10 @@ export default class Customizator {
     this.btnBlock.addEventListener("click", (event) =>
       this.onScaleChange(event)
     );
+
+    this.colorPicker.addEventListener("input", (event) =>
+      this.onColorChange(event)
+    );
   }
 
   onScaleChange(event) {
@@ -21,9 +25,15 @@ export default class Customizator {
           node.nodeName === "#text" &&
           node.nodeValue.replace(/\s+/g, "").length > 0
         ) {
-          let value = window.getComputedStyle(node.parentNode, null).fontSize;
-          node.parentNode.style.fontSize =
-            value.replace(/px/g, "") * scale + "px";
+          if (!node.parentNode.getAttribute("data-fz")) {
+            let value = window.getComputedStyle(node.parentNode, null).fontSize;
+            node.parentNode.setAttribute("data-fz", +value.replace(/px/g, ""));
+            node.parentNode.style.fontSize =
+              node.parentNode.getAttribute("data-fz") * scale + "px";
+          } else {
+            node.parentNode.style.fontSize =
+              node.parentNode.getAttribute("data-fz") * scale + "px";
+          }
         } else {
           recursy(node);
         }
@@ -31,8 +41,53 @@ export default class Customizator {
     }
     recursy(body);
   }
+  onColorChange(event) {
+    const body = document.querySelector("body");
+    body.style.backgroundColor = event.target.value;
+    console.log(event.target.value);
+  }
 
+  injectStyle() {
+    const style = document.createElement("style");
+    style.innerHTML = `
+          .panel {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: fixed;
+            top: 10px;
+            right: 0;
+            border: 1px solid rgba(0,0,0, .2);
+            box-shadow: 0 0 20px rgba(0,0,0, .5);
+            width: 300px;
+            height: 60px;
+            background-color: #fff;
+        }
+        .scale {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 100px;
+            height: 40px;
+        }
+        .scale_btn {
+          display: block;
+          width: 40px;
+          height: 40px;
+          border: 1px solid rgba(0,0,0, .2);
+          border-radius: 4px;
+          font-size: 18px;   
+        }
+        .color {
+            width: 40px;
+            height: 40px;
+        }
+    `;
+    document.querySelector("head").appendChild(style);
+  }
   render() {
+    this.injectStyle();
+
     let scaleInputSmall = document.createElement("input"),
       scaleInputMedium = document.createElement("input"),
       panel = document.createElement("div");
